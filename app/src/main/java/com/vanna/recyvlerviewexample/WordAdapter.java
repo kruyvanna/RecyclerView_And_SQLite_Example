@@ -1,7 +1,9 @@
 package com.vanna.recyvlerviewexample;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +16,16 @@ import java.util.List;
  */
 public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
 
-    private List<DictionaryItem> mDictionaryItems;
+    private Cursor cursor;
 
     // Pass in the contact array into the constructor
-    public WordAdapter(List<DictionaryItem> dictionaryItemList) {
-        mDictionaryItems = dictionaryItemList;
+    public WordAdapter() {
+
+    }
+
+    public void setCursor(Cursor cursor) {
+        this.cursor = cursor;
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -52,16 +59,21 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Log.d("Database", "position " + position);
         // Get the data model based on position
-        DictionaryItem dictionaryItem = mDictionaryItems.get(position);
+        cursor.moveToPosition(position);
+        String word = cursor.getString(0);
 
         // Set item views based on the data model
         TextView textView = holder.wordTextView;
-        textView.setText(dictionaryItem.getWord());
+        textView.setText(word);
     }
 
     @Override
     public int getItemCount() {
-        return mDictionaryItems.size();
+        if (cursor == null) {
+            return 0;
+        }
+        return cursor.getCount();
     }
 }

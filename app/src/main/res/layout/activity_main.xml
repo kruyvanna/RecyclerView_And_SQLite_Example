@@ -7,10 +7,19 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.vanna.recyvlerviewexample.MainActivity">
 
+    <EditText
+        android:id="@+id/searchText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@id/searchText">
     </android.support.v7.widget.RecyclerView>
+
+
 
 </RelativeLayout>
