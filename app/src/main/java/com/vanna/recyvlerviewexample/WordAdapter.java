@@ -17,6 +17,7 @@ import java.util.List;
 public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
 
     private Cursor cursor;
+    private AdapterListener adapterListener;
 
     // Pass in the contact array into the constructor
     public WordAdapter() {
@@ -28,7 +29,11 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public void setAdapterListener(AdapterListener adapterListener){
+        this.adapterListener = adapterListener;
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // Your holder should contain a member variable
         // for any view that will be set as you render a row
         public TextView wordTextView;
@@ -39,8 +44,15 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
             // Stores the itemView in a public final member variable that can be used
             // to access the context from any ViewHolder instance.
             super(itemView);
-
             wordTextView = (TextView) itemView.findViewById(R.id.wordTextView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(adapterListener != null) {
+                adapterListener.onItemClick(getAdapterPosition());
+            }
         }
     }
 

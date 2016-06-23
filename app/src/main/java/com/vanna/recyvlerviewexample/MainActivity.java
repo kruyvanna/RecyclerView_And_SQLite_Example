@@ -1,5 +1,6 @@
 package com.vanna.recyvlerviewexample;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MyDatabase myDatabase;
     private WordAdapter wordAdapter;
+    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,13 +29,25 @@ public class MainActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        List<DictionaryItem> dictionaryItemList = new ArrayList<>();
-        dictionaryItemList.add(new DictionaryItem("Apple", "a fruit"));
-        dictionaryItemList.add(new DictionaryItem("Banana", "another favorite fruit of monkey"));
-
         myDatabase = new MyDatabase(getApplicationContext());
         wordAdapter = new WordAdapter();
         recyclerView.setAdapter(wordAdapter);
+
+        wordAdapter.setAdapterListener(new AdapterListener() {
+            @Override
+            public void onItemClick(int position) {
+                Log.d("MainActivity", "onItemClick " + position);
+                cursor.moveToPosition(position);
+                String word = cursor.getString(0);
+                String definition = cursor.getString(1);
+                Log.d("MainActivity", "word: " + word + ", definition: " + definition);
+
+                Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
+                intent.putExtra("word", word);
+                intent.putExtra("definition", definition);
+                startActivity(intent);
+            }
+        });
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -62,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void search(String word) {
         String[] selectionArgs = { word + "%"};
-        Cursor cursor = myDatabase.getReadableDatabase().rawQuery("SELECT * FROM Dictionary WHERE word LIKE ? LIMIT 100", selectionArgs);
+        cursor = myDatabase.getReadableDatabase().rawQuery("SELECT * FROM Dictionary WHERE word LIKE ? LIMIT 100", selectionArgs);
         wordAdapter.setCursor(cursor);
     }
 }
