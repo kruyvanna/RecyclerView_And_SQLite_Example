@@ -1,5 +1,6 @@
 package com.vanna.recyvlerviewexample;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
@@ -31,27 +32,15 @@ public class MainActivity extends AppCompatActivity {
 
         myDatabase = new MyDatabase(getApplicationContext());
         wordAdapter = new WordAdapter();
-        recyclerView.setAdapter(wordAdapter);
-
-//        writeToDatabaseExample();
-        updateRecordExample();
-        readExample();
-
-        wordAdapter.setAdapterListener(new AdapterListener() {
+        wordAdapter.setWordAdapterListener(new WordAdapterListener() {
             @Override
-            public void onItemClick(int position) {
-                Log.d("MainActivity", "onItemClick " + position);
-                cursor.moveToPosition(position);
-                String word = cursor.getString(0);
-                String definition = cursor.getString(1);
-                Log.d("MainActivity", "word: " + word + ", definition: " + definition);
-
-                Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
-                intent.putExtra("word", word);
-                intent.putExtra("definition", definition);
-                startActivity(intent);
+            public void onItemClicked(String definition) {
+                goToPopup(definition);
             }
         });
+
+        recyclerView.setAdapter(wordAdapter);
+
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -84,31 +73,10 @@ public class MainActivity extends AppCompatActivity {
         wordAdapter.setCursor(cursor);
     }
 
-    private void readExample() {
-        String[] args = {};
-        MyDatabase database = new MyDatabase(getApplicationContext());
-        Cursor cursor = database.getReadableDatabase().rawQuery("SELECT * FROM Dictionary", args);
-
-        // loop all row
-        while(!cursor.isLast()) {
-            cursor.moveToNext();
-            String word = cursor.getString(0); // column 0 is word
-            String definition = cursor.getString(1); //column 1 is definition
-            Log.d("Database", "word: " + word + ", definition: " + definition);
-        }
+    private void goToPopup(String definition) {
+        Intent intent = new Intent(getApplicationContext(), PopupActivity.class);
+        intent.putExtra("definition", definition);
+        startActivity(intent);
     }
 
-    private void writeToDatabaseExample() {
-        MyDatabase database = new MyDatabase(getApplicationContext());
-        String[] data = {"Cat", "A Pet"};
-        database.getWritableDatabase().execSQL("INSERT INTO Dictionary VALUES ( ?, ? )", data);
-        Log.d("Database", "added cat record");
-    }
-
-    private void updateRecordExample() {
-        MyDatabase database = new MyDatabase(getApplicationContext());
-        String[] data = {"A PET UPDATED", "Cat"};
-        database.getWritableDatabase().execSQL("UPDATE Dictionary SET definition = ? WHERE word = ?", data);
-        Log.d("Database", "updated cat definition to A PET UPDATED");
-    }
 }

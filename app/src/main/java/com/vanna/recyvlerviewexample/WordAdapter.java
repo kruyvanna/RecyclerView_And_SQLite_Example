@@ -17,11 +17,15 @@ import java.util.List;
 public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
 
     private Cursor cursor;
-    private AdapterListener adapterListener;
+    private WordAdapterListener wordAdapterListener;
 
     // Pass in the contact array into the constructor
     public WordAdapter() {
 
+    }
+
+    public void setWordAdapterListener(WordAdapterListener wordAdapterListener) {
+        this.wordAdapterListener = wordAdapterListener;
     }
 
     public void setCursor(Cursor cursor) {
@@ -29,11 +33,7 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void setAdapterListener(AdapterListener adapterListener){
-        this.adapterListener = adapterListener;
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         // Your holder should contain a member variable
         // for any view that will be set as you render a row
         public TextView wordTextView;
@@ -45,15 +45,19 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
             // to access the context from any ViewHolder instance.
             super(itemView);
             wordTextView = (TextView) itemView.findViewById(R.id.wordTextView);
-            itemView.setOnClickListener(this);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getLayoutPosition();
+                    cursor.moveToPosition(position);
+                    String word = cursor.getString(0);
+                    String definition = cursor.getString(1);
+                    wordAdapterListener.onItemClicked(definition);
+                    Log.d("Adapter", "clicked " + getLayoutPosition() + " word:" + word);
+                }
+            });
         }
 
-        @Override
-        public void onClick(View v) {
-            if(adapterListener != null) {
-                adapterListener.onItemClick(getAdapterPosition());
-            }
-        }
     }
 
     @Override
