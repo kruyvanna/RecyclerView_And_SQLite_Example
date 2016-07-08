@@ -33,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
         wordAdapter = new WordAdapter();
         recyclerView.setAdapter(wordAdapter);
 
+//        writeToDatabaseExample();
+        updateRecordExample();
+        readExample();
+
         wordAdapter.setAdapterListener(new AdapterListener() {
             @Override
             public void onItemClick(int position) {
@@ -78,5 +82,33 @@ public class MainActivity extends AppCompatActivity {
         String[] selectionArgs = { word + "%"};
         cursor = myDatabase.getReadableDatabase().rawQuery("SELECT * FROM Dictionary WHERE word LIKE ? LIMIT 100", selectionArgs);
         wordAdapter.setCursor(cursor);
+    }
+
+    private void readExample() {
+        String[] args = {};
+        MyDatabase database = new MyDatabase(getApplicationContext());
+        Cursor cursor = database.getReadableDatabase().rawQuery("SELECT * FROM Dictionary", args);
+
+        // loop all row
+        while(!cursor.isLast()) {
+            cursor.moveToNext();
+            String word = cursor.getString(0); // column 0 is word
+            String definition = cursor.getString(1); //column 1 is definition
+            Log.d("Database", "word: " + word + ", definition: " + definition);
+        }
+    }
+
+    private void writeToDatabaseExample() {
+        MyDatabase database = new MyDatabase(getApplicationContext());
+        String[] data = {"Cat", "A Pet"};
+        database.getWritableDatabase().execSQL("INSERT INTO Dictionary VALUES ( ?, ? )", data);
+        Log.d("Database", "added cat record");
+    }
+
+    private void updateRecordExample() {
+        MyDatabase database = new MyDatabase(getApplicationContext());
+        String[] data = {"A PET UPDATED", "Cat"};
+        database.getWritableDatabase().execSQL("UPDATE Dictionary SET definition = ? WHERE word = ?", data);
+        Log.d("Database", "updated cat definition to A PET UPDATED");
     }
 }
